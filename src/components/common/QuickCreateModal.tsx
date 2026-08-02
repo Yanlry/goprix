@@ -34,7 +34,7 @@ export function QuickCreateModal({ type, onClose, onCreated }: Props) {
         setError("Cette catégorie existe déjà"); return;
       }
       addCategory({
-        id: `cat-${Date.now()}`,
+        id: crypto.randomUUID(),
         slug: autoSlug(trimmed),
         name: trimmed,
         description: "",
@@ -48,7 +48,7 @@ export function QuickCreateModal({ type, onClose, onCreated }: Props) {
         setError("Cette marque existe déjà"); return;
       }
       addBrand({
-        id: `b-${Date.now()}`,
+        id: crypto.randomUUID(),
         slug: autoSlug(trimmed),
         name: trimmed,
         logo: image,
