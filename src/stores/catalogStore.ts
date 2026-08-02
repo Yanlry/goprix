@@ -4,6 +4,21 @@ import { create } from "zustand";
 import { supabase } from "@/lib/supabase";
 import type { Product, Category, Brand, ReservationItem } from "@/types";
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function sortByName<T extends { name: string }>(items: T[], lastPattern = /^autres?$/i): T[] {
+  return [...items].sort((a, b) => {
+    const aLast = lastPattern.test(a.name.trim());
+    const bLast = lastPattern.test(b.name.trim());
+    if (aLast && !bLast) return 1;
+    if (!aLast && bLast) return -1;
+    return a.name.localeCompare(b.name, "fr", { sensitivity: "base" });
+  });
+}
+
+const sortCategories = (cats: Category[]) => sortByName(cats);
+const sortBrands     = (brands: Brand[])  => sortByName(brands);
+
 // ─── Mappers Supabase → TypeScript ───────────────────────────────────────────
 
 function mapProduct(r: Record<string, unknown>): Product {
@@ -155,8 +170,8 @@ export const useCatalogStore = create<CatalogState>()((set, get) => ({
     ]);
     set({
       products:    (products ?? []).map(mapProduct),
-      categories:  (categories ?? []).map(mapCategory),
-      brands:      (brands ?? []).map(mapBrand),
+      categories:  sortCategories((categories ?? []).map(mapCategory)),
+      brands:      sortBrands((brands ?? []).map(mapBrand)),
       initialized: true,
     });
   },
@@ -195,14 +210,14 @@ export const useCatalogStore = create<CatalogState>()((set, get) => ({
 
   // ── Categories ───────────────────────────────────────────
   addCategory: (c) => {
-    set((s) => ({ categories: [...s.categories, c] }));
+    set((s) => ({ categories: sortCategories([...s.categories, c]) }));
     supabase.from("categories").insert(toDbCategory(c)).then(({ error }) => {
       if (error) console.error("addCategory:", error.message);
     });
   },
 
   updateCategory: (id, updates) => {
-    set((s) => ({ categories: s.categories.map((c) => (c.id === id ? { ...c, ...updates } : c)) }));
+    set((s) => ({ categories: sortCategories(s.categories.map((c) => (c.id === id ? { ...c, ...updates } : c))) }));
     supabase.from("categories").update(toDbCategory(updates)).eq("id", id).then(({ error }) => {
       if (error) console.error("updateCategory:", error.message);
     });
@@ -217,14 +232,14 @@ export const useCatalogStore = create<CatalogState>()((set, get) => ({
 
   // ── Brands ───────────────────────────────────────────────
   addBrand: (b) => {
-    set((s) => ({ brands: [...s.brands, b] }));
+    set((s) => ({ brands: sortBrands([...s.brands, b]) }));
     supabase.from("brands").insert(toDbBrand(b)).then(({ error }) => {
       if (error) console.error("addBrand:", error.message);
     });
   },
 
   updateBrand: (id, updates) => {
-    set((s) => ({ brands: s.brands.map((b) => (b.id === id ? { ...b, ...updates } : b)) }));
+    set((s) => ({ brands: sortBrands(s.brands.map((b) => (b.id === id ? { ...b, ...updates } : b))) }));
     supabase.from("brands").update(toDbBrand(updates)).eq("id", id).then(({ error }) => {
       if (error) console.error("updateBrand:", error.message);
     });
