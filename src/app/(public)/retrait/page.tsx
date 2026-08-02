@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, CheckCircle, ArrowRight } from "lucide-react";
-import { StoreCard } from "@/components/common/StoreCard";
+import { CheckCircle, ArrowRight, MapPin, Clock } from "lucide-react";
 import { SafeImage } from "@/components/common/SafeImage";
+import { StoreCard } from "@/components/common/StoreCard";
 import { useCartStore } from "@/stores/cartStore";
 import { useStorePickerStore } from "@/stores/storePickerStore";
 import { useReservationsStore } from "@/stores/reservationsStore";
@@ -55,12 +55,10 @@ function getStoreHoursForDate(store: Store, date: Date) {
 
 function buildSlotsForDate(store: Store, date: Date, now: Date): PickupSlot[] {
   const hours = getStoreHoursForDate(store, date);
-
   if (!hours || hours.isClosed || !hours.open || !hours.close) return [];
 
   const open = parseTimeToMinutes(hours.open);
   const close = parseTimeToMinutes(hours.close);
-
   if (open === null || close === null || close <= open) return [];
 
   const dateString = toLocalDateString(date);
@@ -78,13 +76,11 @@ function buildSlotsForDate(store: Store, date: Date, now: Date): PickupSlot[] {
       endTime: formatMinutes(start + SLOT_DURATION_MINUTES),
     });
   }
-
   return slots;
 }
 
 function buildCalendarDays(store: Store | null): CalendarDay[] {
   if (!store) return [];
-
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -119,7 +115,9 @@ export default function RetraitPage() {
   }, [user, router]);
 
   if (!user) return null;
-  const [query, setQuery] = useState("");
+
+  const singleStore = stores.length === 1;
+
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<PickupSlot | null>(null);
@@ -129,16 +127,16 @@ export default function RetraitPage() {
   const { addReservation } = useReservationsStore();
   const { reduceStock } = useCatalogStore();
 
-  const filteredStores = stores.filter((s) =>
-    `${s.name} ${s.city} ${s.postalCode}`.toLowerCase().includes(query.toLowerCase())
-  );
-  const selectedStore = stores.find((store) => store.id === selectedStoreId) || stores[0] || null;
+  const selectedStore = singleStore
+    ? stores[0]
+    : (stores.find((s) => s.id === selectedStoreId) ?? null);
+
   const calendarDays = useMemo(() => buildCalendarDays(selectedStore), [selectedStore]);
   const firstAvailableDate = calendarDays.find((day) => !day.isDisabled)?.date;
-  const activeDate = calendarDays.some((day) => day.date === selectedDate && !day.isDisabled)
+  const activeDate = calendarDays.some((d) => d.date === selectedDate && !d.isDisabled)
     ? selectedDate
     : firstAvailableDate || calendarDays[0]?.date || "";
-  const activeDay = calendarDays.find((day) => day.date === activeDate);
+  const activeDay = calendarDays.find((d) => d.date === activeDate);
   const slotsForDate = activeDay?.slots || [];
 
   const handleSelectStore = (storeId: string) => {
@@ -184,75 +182,96 @@ export default function RetraitPage() {
       </nav>
 
       <h1 className="text-2xl font-bold text-gray-900 mb-8">
-        1. Choisissez votre <span className="text-[#7C3AED]">point de retrait</span>
+        Choisissez votre <span className="text-[#7C3AED]">créneau de retrait</span>
       </h1>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Left: step 1 + step 2 */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Store selection */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <h2 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-purple-600 text-white text-xs flex items-center justify-center font-bold">1</div>
-              Sélectionner un magasin
-            </h2>
 
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input type="text" value={query} onChange={(e) => setQuery(e.target.value)}
-                placeholder="Rechercher par ville ou code postal"
-                className="w-full pl-9 pr-4 h-10 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-200" />
-            </div>
-
-            <div className="mb-4 overflow-hidden rounded-xl border border-gray-100 bg-gray-100">
-              <SafeImage
-                src={selectedStore?.image}
-                alt={selectedStore ? selectedStore.name : "Point de retrait"}
-                className="h-80 w-full sm:h-[26.5rem]"
-                imageClassName="object-cover object-center"
-                sizes="(max-width: 1024px) 100vw, 900px"
-              />
-              {selectedStore && (
-                <div className="border-t border-white/20 bg-gray-950 px-4 py-3 text-white">
-                  <p className="text-sm font-bold">{selectedStore.name}</p>
-                  <p className="text-xs text-white/75">
-                    {selectedStore.address}, {selectedStore.postalCode} {selectedStore.city}
+          {/* ── Magasin ── */}
+          {singleStore ? (
+            /* Un seul magasin : affiché directement, pas de sélection */
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="relative h-56 sm:h-72 w-full bg-gray-100">
+                <SafeImage
+                  src={selectedStore?.image}
+                  alt={selectedStore?.name ?? "Magasin"}
+                  className="h-full w-full"
+                  imageClassName="object-cover object-center"
+                  sizes="(max-width: 1024px) 100vw, 700px"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                  <p className="text-xl font-bold">{selectedStore?.name}</p>
+                  <p className="text-sm text-white/80 flex items-center gap-1.5 mt-1">
+                    <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                    {selectedStore?.address}, {selectedStore?.postalCode} {selectedStore?.city}
                   </p>
+                  {selectedStore?.clickAndCollectDelay != null && (
+                    <p className="text-xs text-white/70 flex items-center gap-1.5 mt-0.5">
+                      <Clock className="w-3 h-3 flex-shrink-0" />
+                      Commande prête sous {selectedStore.clickAndCollectDelay}h
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Plusieurs magasins : sélection avec recherche */
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <h2 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-purple-600 text-white text-xs flex items-center justify-center font-bold">1</div>
+                Sélectionner un magasin
+              </h2>
+
+              {selectedStore && (
+                <div className="mb-4 overflow-hidden rounded-xl border border-gray-100 bg-gray-100">
+                  <SafeImage
+                    src={selectedStore.image}
+                    alt={selectedStore.name}
+                    className="h-48 w-full"
+                    imageClassName="object-cover object-center"
+                    sizes="(max-width: 1024px) 100vw, 700px"
+                  />
+                  <div className="bg-gray-900 px-4 py-3 text-white">
+                    <p className="text-sm font-bold">{selectedStore.name}</p>
+                    <p className="text-xs text-white/75">
+                      {selectedStore.address}, {selectedStore.postalCode} {selectedStore.city}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {stores.length === 0 ? (
+                <div className="rounded-xl border border-orange-100 bg-orange-50 p-4 text-sm text-orange-700">
+                  Aucun point de retrait n&apos;est disponible pour le moment.
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                  {stores.map((store) => (
+                    <StoreCard
+                      key={store.id}
+                      store={store}
+                      selected={selectedStore?.id === store.id}
+                      onSelect={() => handleSelectStore(store.id)}
+                      compact
+                    />
+                  ))}
                 </div>
               )}
             </div>
+          )}
 
-            {stores.length === 0 ? (
-              <div className="rounded-xl border border-orange-100 bg-orange-50 p-4 text-sm text-orange-700">
-                Aucun point de retrait n&apos;est disponible pour le moment.
-              </div>
-            ) : filteredStores.length === 0 ? (
-              <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-500">
-                Aucun magasin ne correspond à votre recherche.
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
-                {filteredStores.map((store) => (
-                  <StoreCard
-                    key={store.id}
-                    store={store}
-                    selected={selectedStore?.id === store.id}
-                    onSelect={() => handleSelectStore(store.id)}
-                    compact
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Slot selection */}
+          {/* ── Créneaux ── */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
             <h2 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-purple-600 text-white text-xs flex items-center justify-center font-bold">2</div>
-              Choisir vos créneaux de retrait
+              <div className="w-6 h-6 rounded-full bg-purple-600 text-white text-xs flex items-center justify-center font-bold">
+                {singleStore ? "1" : "2"}
+              </div>
+              Choisir votre créneau de retrait
             </h2>
 
-            {/* Calendar */}
+            {/* Calendrier */}
             <div className="flex gap-2 mb-5 overflow-x-auto pb-1">
               {calendarDays.map((calendarDay) => (
                 <button
@@ -280,7 +299,7 @@ export default function RetraitPage() {
               ))}
             </div>
 
-            {/* Time slots */}
+            {/* Créneaux horaires */}
             {slotsForDate.length > 0 ? (
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                 {slotsForDate.map((slot, i) => (
@@ -313,7 +332,7 @@ export default function RetraitPage() {
             )}
           </div>
 
-          {/* Info blocks */}
+          {/* Infos */}
           <div className="grid sm:grid-cols-4 gap-3">
             {[
               { icon: "🏪", title: "Click & Collect uniquement", desc: "Retrait gratuit en magasin" },
@@ -330,7 +349,7 @@ export default function RetraitPage() {
           </div>
         </div>
 
-        {/* Right: order summary */}
+        {/* Récapitulatif commande */}
         <div>
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sticky top-24">
             <h3 className="text-sm font-bold text-gray-900 mb-4">Récapitulatif de la commande</h3>
@@ -381,7 +400,7 @@ export default function RetraitPage() {
               disabled={!selectedStore || !selectedSlot || items.length === 0 || stores.length === 0}
               className="w-full h-12 bg-[#7C3AED] text-white rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-[#6D28D9] transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-purple-200"
             >
-              Continuer et valider ma réservation
+              Confirmer ma réservation
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
