@@ -57,11 +57,14 @@ export const useAuthStore = create<AuthState>()(
       },
 
       loginAdmin: async (email, password) => {
-        if (email === "admin@goprix.fr" && password === "Admin123!") {
-          set({ isAdmin: true });
-          return true;
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error || !data.user) return false;
+        if (data.user.email !== "admin@goprix.fr") {
+          await supabase.auth.signOut();
+          return false;
         }
-        return false;
+        set({ isAdmin: true, user: mapUser(data.user) });
+        return true;
       },
 
       register: async ({ email, password, firstName, lastName, phone }) => {
@@ -95,14 +98,29 @@ export const useAuthStore = create<AuthState>()(
         await supabase.auth.signOut();
       },
 
-      logoutAdmin: () => set({ isAdmin: false }),
+      logoutAdmin: async () => {
+        set({ isAdmin: false, user: null });
+        await supabase.auth.signOut();
+      },
 
       initAuth: async () => {
         const { data: { session } } = await supabase.auth.getSession();
-        set({ user: session?.user ? mapUser(session.user) : null });
+        if (session?.user) {
+          set({
+            user: mapUser(session.user),
+            isAdmin: session.user.email === "admin@goprix.fr",
+          });
+        }
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-          set({ user: session?.user ? mapUser(session.user) : null });
+          if (session?.user) {
+            set({
+              user: mapUser(session.user),
+              isAdmin: session.user.email === "admin@goprix.fr",
+            });
+          } else {
+            set({ user: null, isAdmin: false });
+          }
         });
 
         return () => subscription.unsubscribe();

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Search, User, Heart, ShoppingCart, Menu, X, ChevronDown,
-  MapPin, Store, Bell, LogOut, Package, ArrowRight
+  MapPin, Store, Bell, LogOut, Package, ArrowRight, Phone
 } from "lucide-react";
 import { useCatalogStore } from "@/stores/catalogStore";
 import { useCartStore } from "@/stores/cartStore";
@@ -365,20 +365,19 @@ export function PublicHeader() {
             })}
           </div>
 
-          {/* Click & Collect indicator */}
-          <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-1.5">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <div className="text-xs">
-              <span className="font-semibold text-green-700">
-                {selectedStore ? selectedStore.name : "Click & Collect"}
-              </span>
-              <br />
-              <span className="text-green-600">
-                {selectedStore ? "Magasin sélectionné" : "100% gratuit"}
-              </span>
+          {/* Bouton appel */}
+          <a
+            href="tel:0986249887"
+            className="flex items-center gap-2.5 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white rounded-xl px-4 py-2 transition-colors shadow-sm shadow-green-200"
+          >
+            <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+              <Phone className="w-4 h-4" />
             </div>
-            <MapPin className="w-4 h-4 text-green-600" />
-          </div>
+            <div className="text-xs leading-tight">
+              <p className="font-bold tracking-wide">09 86 24 98 87</p>
+              <p className="text-green-100 font-medium">Appel gratuit</p>
+            </div>
+          </a>
         </div>
       </div>
 
