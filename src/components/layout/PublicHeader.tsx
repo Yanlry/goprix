@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import {
   Search, User, Heart, ShoppingCart, Menu, X, ChevronDown,
-  MapPin, Store, Bell, LogOut, Package, ArrowRight, Phone
+  MapPin, Store, Bell, LogOut, Package, ArrowRight, Phone, LayoutDashboard
 } from "lucide-react";
 import { useCatalogStore } from "@/stores/catalogStore";
 import { useCartStore } from "@/stores/cartStore";
@@ -38,7 +38,7 @@ export function PublicHeader() {
   const itemCount = useCartStore((s) => s.itemCount());
   const favoriteCount = useFavoritesStore((s) => s.items.length);
   const { selectedStore } = useStorePickerStore();
-  const { user, logout } = useAuthStore();
+  const { user, logout, isAdmin } = useAuthStore();
 
   const productCountsByCategory = useMemo(
     () =>
@@ -159,29 +159,50 @@ export function PublicHeader() {
           {/* Right icons */}
           <div className="flex items-center gap-1 ml-auto md:ml-0">
             {/* Account */}
-            <div className="relative group">
-              <Link
-                href={user ? "/compte" : "/connexion"}
-                className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl hover:bg-purple-50 text-gray-600 hover:text-purple-700 transition-colors"
-              >
-                <User className="w-5 h-5" />
-                <span className="text-[10px] hidden sm:block">{user ? user.firstName : "Mon compte"}</span>
-              </Link>
-              {user && (
-                <div className="absolute top-full right-0 mt-1 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                  <Link href="/compte" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">
-                    <User className="w-4 h-4" /> Mon compte
-                  </Link>
-                  <Link href="/compte/reservations" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">
-                    <Bell className="w-4 h-4" /> Mes réservations
+            {isAdmin ? (
+              <div className="relative group">
+                <Link
+                  href="/administration"
+                  className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl hover:bg-purple-100 bg-purple-50 text-purple-700 transition-colors"
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                  <span className="text-[10px] hidden sm:block font-semibold">Tableau de bord</span>
+                </Link>
+                <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  <Link href="/administration" className="flex items-center gap-2 px-4 py-2 text-sm text-purple-700 font-semibold hover:bg-purple-50">
+                    <LayoutDashboard className="w-4 h-4" /> Tableau de bord
                   </Link>
                   <hr className="my-1 border-gray-100" />
                   <button onClick={logout} className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
                     <LogOut className="w-4 h-4" /> Déconnexion
                   </button>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="relative group">
+                <Link
+                  href={user ? "/compte" : "/connexion"}
+                  className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl hover:bg-purple-50 text-gray-600 hover:text-purple-700 transition-colors"
+                >
+                  <User className="w-5 h-5" />
+                  <span className="text-[10px] hidden sm:block">{user ? user.firstName : "Mon compte"}</span>
+                </Link>
+                {user && (
+                  <div className="absolute top-full right-0 mt-1 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <Link href="/compte" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">
+                      <User className="w-4 h-4" /> Mon compte
+                    </Link>
+                    <Link href="/compte/reservations" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-purple-50">
+                      <Bell className="w-4 h-4" /> Mes réservations
+                    </Link>
+                    <hr className="my-1 border-gray-100" />
+                    <button onClick={logout} className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                      <LogOut className="w-4 h-4" /> Déconnexion
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Favorites */}
             <Link
@@ -481,10 +502,17 @@ export function PublicHeader() {
                 );
               })}
               <hr className="my-3" />
-              <Link href="/compte" onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-purple-50 rounded-xl">
-                <User className="w-4 h-4" /> {user ? "Mon compte" : "Connexion"}
-              </Link>
+              {isAdmin ? (
+                <Link href="/administration" onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 w-full px-4 py-3 text-purple-700 font-semibold bg-purple-50 hover:bg-purple-100 rounded-xl">
+                  <LayoutDashboard className="w-4 h-4" /> Tableau de bord
+                </Link>
+              ) : (
+                <Link href={user ? "/compte" : "/connexion"} onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-purple-50 rounded-xl">
+                  <User className="w-4 h-4" /> {user ? "Mon compte" : "Connexion"}
+                </Link>
+              )}
               <Link href="/favoris" onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-3 w-full px-4 py-3 text-gray-700 hover:bg-purple-50 rounded-xl">
                 <Heart className="w-4 h-4" /> Mes favoris
