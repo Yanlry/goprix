@@ -173,7 +173,7 @@ export default function MagasinsAdminPage() {
       return;
     }
 
-    const id = editingId || `store-${Date.now()}`;
+    const id = editingId || crypto.randomUUID();
     const store = buildStore(form, id);
 
     if (editingId) updateStore(editingId, store);

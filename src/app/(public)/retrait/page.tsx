@@ -153,7 +153,7 @@ export default function RetraitPage() {
     setSlot(selectedSlot);
 
     const reservation: Reservation = {
-      id: `res-${Date.now()}`,
+      id: crypto.randomUUID(),
       orderNumber: `GPX-${Math.floor(10000 + Math.random() * 90000)}`,
       status: "nouvelle",
       items: items.map((i) => ({ product: i.product, quantity: i.quantity, price: i.product.price })),

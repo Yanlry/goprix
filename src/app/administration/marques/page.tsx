@@ -30,7 +30,7 @@ export default function MarquesAdminPage() {
       setError("Cette marque existe déjà"); return;
     }
     addBrand({
-      id: `b-${Date.now()}`,
+      id: crypto.randomUUID(),
       slug: autoSlug(form.name),
       name: form.name.trim(),
       logo: form.logo,

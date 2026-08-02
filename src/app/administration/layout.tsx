@@ -6,6 +6,7 @@ import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { useAuthStore } from "@/stores/authStore";
 import { useCatalogStore } from "@/stores/catalogStore";
 import { useStoresStore } from "@/stores/storesStore";
+import { useReservationsStore } from "@/stores/reservationsStore";
 import { Bell, Search } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -14,8 +15,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   useEffect(() => {
-    useCatalogStore.persist.rehydrate();
-    useStoresStore.persist.rehydrate();
+    useCatalogStore.getState().initialize();
+    useStoresStore.getState().initialize();
+    useReservationsStore.getState().initializeForAdmin();
   }, []);
 
   useEffect(() => {

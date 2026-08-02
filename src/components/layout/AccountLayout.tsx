@@ -17,10 +17,10 @@ const navItems = [
   { icon: User,             label: "Informations personnelles",  href: "/compte/profil" },
   { icon: ShoppingBag,      label: "Mes réservations",           href: "/compte/reservations" },
   { icon: MessageSquare,    label: "Messages du vendeur",        href: "/compte/messages" },
-  { icon: Heart,            label: "Mes favoris",                href: "/favoris" },
+  { icon: Heart,            label: "Mes favoris",                href: "/compte/favoris" },
   { icon: Bell,             label: "Notifications",              href: "/compte/notifications" },
   { icon: CreditCard,       label: "Paiements",                  href: "/compte/paiements" },
-  { icon: MapPin,           label: "Infos magasin",              href: "/contact" },
+  { icon: MapPin,           label: "Infos magasin",              href: "/compte/infos-magasin" },
   { icon: Settings,         label: "Paramètres",                 href: "/compte/parametres" },
 ];
 

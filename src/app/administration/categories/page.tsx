@@ -26,7 +26,7 @@ export default function CategoriesAdminPage() {
   const handleCreate = () => {
     if (!form.name.trim()) { setError("Le nom est requis"); return; }
     addCategory({
-      id: `cat-${Date.now()}`,
+      id: crypto.randomUUID(),
       slug: autoSlug(form.name),
       name: form.name.trim(),
       description: "",

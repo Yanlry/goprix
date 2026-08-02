@@ -59,7 +59,7 @@ export default function NouveauProduitPage() {
     const foundCat = categories.find((c) => c.name === form.category);
 
     const product: Product = {
-      id: `p-${Date.now()}`,
+      id: crypto.randomUUID(),
       slug: autoSlug(form.name) + "-" + Date.now(),
       name: form.name.trim(),
       brand: form.brand,
@@ -77,7 +77,7 @@ export default function NouveauProduitPage() {
       isPromo: false,
       isEndOfSeries: false,
       isActive: form.isActive,
-      reference: `REF-${Date.now()}`,
+      reference: `REF-${Date.now().toString(36).toUpperCase()}`,
       barcode: "",
       stockByStore: createDefaultStockByStore(stores, parseInt(form.stock) || 10),
       tags: [],
