@@ -85,10 +85,6 @@ function ConnexionForm() {
             Pas encore de compte ?{" "}
             <Link href="/inscription" className="text-purple-700 font-semibold hover:underline">Créer un compte</Link>
           </div>
-
-          <div className="mt-4 p-3 bg-purple-50 rounded-xl text-xs text-gray-500 text-center">
-            <strong>Admin :</strong> admin@goprix.fr / Admin123!
-          </div>
         </div>
       </div>
     </div>

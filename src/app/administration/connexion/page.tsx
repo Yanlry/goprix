@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LogIn, Shield } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("admin@goprix.fr");
-  const [password, setPassword] = useState("Admin123!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -63,15 +63,10 @@ export default function AdminLoginPage() {
               {loading ? "Connexion..." : "Se connecter"}
             </button>
           </form>
-
-          <div className="mt-5 p-3 bg-gray-700/50 rounded-xl text-xs text-gray-400 text-center border border-gray-600/50">
-            <strong className="text-gray-300">Identifiants demo :</strong><br />
-            admin@goprix.fr / Admin123!
-          </div>
         </div>
 
         <p className="text-center text-xs text-gray-600 mt-6">
-          <a href="/" className="hover:text-gray-400 transition-colors">← Retour au site public</a>
+          <Link href="/" className="hover:text-gray-400 transition-colors">← Retour au site public</Link>
         </p>
       </div>
     </div>
