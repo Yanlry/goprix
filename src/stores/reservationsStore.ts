@@ -59,6 +59,24 @@ export const useReservationsStore = create<ReservationsState>()((set, get) => ({
       .order("created_at", { ascending: false });
     if (error) { console.error("reservations (admin):", error.message); return; }
     set({ reservations: (data ?? []).map(mapReservation), initialized: true });
+
+    supabase
+      .channel("admin-reservations")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "reservations" }, (payload) => {
+        const r = mapReservation(payload.new as Record<string, unknown>);
+        set((s) => ({ reservations: [r, ...s.reservations] }));
+        const { useAdminNotificationsStore } = require("@/stores/adminNotificationsStore");
+        useAdminNotificationsStore.getState().add({
+          id: r.id,
+          reservationId: r.id,
+          orderNumber: r.orderNumber,
+          customerName: r.customerName ?? "Client",
+          storeName: r.store?.name ?? "",
+          total: r.total,
+          createdAt: r.createdAt,
+        });
+      })
+      .subscribe();
   },
 
   reset: () => set({ reservations: [], initialized: false }),

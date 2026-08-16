@@ -13,7 +13,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 const menuItems = [
   { label: "Tableau de bord", href: "/administration", icon: LayoutDashboard },
-  { label: "Commandes C&C", href: "/administration/commandes", icon: ShoppingBag },
+  { label: "Commandes", href: "/administration/commandes", icon: ShoppingBag },
   { label: "Produits", href: "/administration/produits", icon: Package },
   { label: "Catégories", href: "/administration/categories", icon: Tag },
   { label: "Marques", href: "/administration/marques", icon: Award },
@@ -32,7 +32,9 @@ export function AdminSidebar() {
       <div className="flex items-center justify-between p-4 border-b border-white/10">
         {!collapsed && (
           <div className="flex items-center gap-2">
-            <Image src="/logo.jpg" alt="Goprix" width={80} height={32} className="h-8 w-auto brightness-0 invert" />
+            <div className="bg-white rounded-lg px-2 py-1">
+              <Image src="/logo.jpg" alt="Goprix" width={80} height={32} className="h-6 w-auto" />
+            </div>
             <span className="text-xs text-gray-500 font-medium">Admin</span>
           </div>
         )}

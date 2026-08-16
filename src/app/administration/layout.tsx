@@ -7,7 +7,8 @@ import { useAuthStore } from "@/stores/authStore";
 import { useCatalogStore } from "@/stores/catalogStore";
 import { useStoresStore } from "@/stores/storesStore";
 import { useReservationsStore } from "@/stores/reservationsStore";
-import { Bell, Search } from "lucide-react";
+import { Search } from "lucide-react";
+import { NotificationBell } from "@/components/admin/NotificationBell";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { isAdmin } = useAuthStore();
@@ -43,10 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <input type="text" placeholder="Rechercher..." className="pl-9 pr-4 h-9 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-200 w-56 bg-gray-50" />
           </div>
           <div className="flex items-center gap-3">
-            <button className="relative w-9 h-9 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-500">
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
+            <NotificationBell />
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center text-white text-xs font-bold">AD</div>
               <div className="hidden sm:block">

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Search, Package, X, MapPin, Calendar, Clock,
   ChevronRight, Send, MessageSquare, CheckCircle,
@@ -346,11 +347,19 @@ function OrderModal({
 export default function CommandesAdminPage() {
   const { reservations, updateStatus, addMessage } = useReservationsStore();
   const { restoreStock } = useCatalogStore();
+  const searchParams = useSearchParams();
 
-  const [query,       setQuery]       = useState("");
+  const [query,        setQuery]        = useState("");
   const [statusFilter, setStatusFilter] = useState<ReservationStatus | "all">("all");
-  const [storeFilter, setStoreFilter] = useState("all");
-  const [selected,    setSelected]    = useState<Reservation | null>(null);
+  const [storeFilter,  setStoreFilter]  = useState("all");
+  const [selected,     setSelected]     = useState<Reservation | null>(null);
+
+  useEffect(() => {
+    const orderNumber = searchParams.get("order");
+    if (!orderNumber || reservations.length === 0) return;
+    const match = reservations.find((r) => r.orderNumber === orderNumber);
+    if (match) setSelected(match);
+  }, [searchParams, reservations]);
 
   const stores = [...new Set(reservations.map((r) => r.store.name))];
 
