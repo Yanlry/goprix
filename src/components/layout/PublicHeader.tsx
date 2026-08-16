@@ -16,6 +16,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 const navLinks: Array<{ label: string; href: string; badge?: boolean }> = [
   { label: "Accueil", href: "/" },
+  { label: "Nos produits", href: "/produits" },
   { label: "Nouveautés", href: "/nouveautes" },
   { label: "Nos marques", href: "/marques" },
   { label: "À propos", href: "/a-propos" },
