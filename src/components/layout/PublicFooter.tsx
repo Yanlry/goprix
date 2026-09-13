@@ -38,7 +38,9 @@ export function PublicFooter() {
       <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
         {/* Brand */}
         <div className="col-span-2 md:col-span-1">
-          <Image src="/logo.jpg" alt="Goprix" width={100} height={40} className="h-10 w-auto brightness-0 invert mb-4" />
+          <div className="inline-block bg-white rounded-lg px-3 py-2 mb-4">
+            <Image src="/logo.jpg" alt="Goprix" width={100} height={40} className="h-8 w-auto" />
+          </div>
           <p className="text-sm text-gray-400 leading-relaxed">
             Spécialiste du déstockage et surplus. Des milliers de produits à prix cassés, disponibles uniquement en Click &amp; Collect.
           </p>
@@ -114,8 +116,13 @@ export function PublicFooter() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
           <p>© 2026 Goprix. Tous droits réservés. Spécialiste du déstockage.</p>
           <div className="flex gap-5">
-            {["CGV", "Confidentialité", "Mentions légales", "Cookies"].map((l) => (
-              <a key={l} href="#" className="hover:text-gray-300 transition-colors">{l}</a>
+            {[
+              { label: "CGV", href: "/cgv" },
+              { label: "Confidentialité", href: "/confidentialite" },
+              { label: "Mentions légales", href: "/mentions-legales" },
+              { label: "Cookies", href: "/cookies" },
+            ].map((l) => (
+              <Link key={l.href} href={l.href} className="hover:text-gray-300 transition-colors">{l.label}</Link>
             ))}
           </div>
         </div>

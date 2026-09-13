@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Cookie } from "lucide-react";
 
 const STORAGE_KEY = "goprix_cookie_consent";
@@ -29,7 +30,10 @@ export function CookieConsent() {
         <div className="flex-1 text-sm text-gray-600">
           <p className="text-gray-900 font-semibold mb-1">Gestion des cookies</p>
           Nous utilisons des cookies pour améliorer votre expérience, mesurer l&apos;audience et vous proposer des offres
-          adaptées. Vous pouvez accepter ou refuser leur utilisation.
+          adaptées. Vous pouvez accepter ou refuser leur utilisation.{" "}
+          <Link href="/cookies" className="text-[#7C3AED] font-medium hover:underline">
+            En savoir plus
+          </Link>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
           <button
