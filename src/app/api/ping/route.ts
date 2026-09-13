@@ -7,7 +7,7 @@ export async function GET() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const { error } = await supabase.from("produits").select("id").limit(1);
+  const { error } = await supabase.from("products").select("id").limit(1);
 
   if (error) {
     return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
